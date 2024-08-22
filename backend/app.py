@@ -11,10 +11,24 @@ def connect_db():
 def get_cards():
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT name, type FROM card_info")  # 適切なテーブル名を指定してください
-    cards = cursor.fetchall()
+    
+    # insect_cards テーブルからカードデータを取得
+    cursor.execute("SELECT name, 'Insect' as type FROM insect_cards")
+    insect_cards = cursor.fetchall()
+    
+    # spell_enhancement_cards テーブルからカードデータを取得
+    cursor.execute("SELECT name, 'Spell/Enhancement' as type FROM spell_enhancement_cards")
+    spell_enhancement_cards = cursor.fetchall()
+    
+    # 両方のリストを結合
+    all_cards = insect_cards + spell_enhancement_cards
+    
+    # データベース接続を閉じる
     conn.close()
-    return jsonify([{"name": card[0], "type": card[1]} for card in cards])
+    
+    # JSON形式で返す
+    return jsonify([{"name": card[0], "type": card[1]} for card in all_cards])
 
 if __name__ == '__main__':
     app.run(debug=True)
+
