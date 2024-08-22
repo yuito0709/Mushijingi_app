@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'card_list_screen.dart';
+import 'deck_builder_screen.dart';
+import 'deck_viewer_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,53 +13,55 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '蟲神器カード表示',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        brightness: Brightness.light,
+        primaryColor: Colors.black,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          secondary: Colors.grey,
+        ),
+        fontFamily: 'San Francisco',
+        textTheme: TextTheme(
+          headlineLarge: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+          titleLarge: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'San Francisco'),
+        ),
       ),
-      home: CardListScreen(),
+      home: HomeScreen(),
     );
   }
 }
 
-class CardListScreen extends StatefulWidget {
-  @override
-  _CardListScreenState createState() => _CardListScreenState();
-}
-
-class _CardListScreenState extends State<CardListScreen> {
-  List<dynamic> cards = [];
-
-  @override
-  void initState() {
-    super.initState();
-    fetchCards();
-  }
-
-  fetchCards() async {
-    // PythonバックエンドのURLを指定してください
-    final response = await http.get(Uri.parse('http://127.0.0.1:5000/cards'));
-    if (response.statusCode == 200) {
-      setState(() {
-        cards = json.decode(response.body);
-      });
-    } else {
-      throw Exception('カードデータの取得に失敗しました');
-    }
-  }
-
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('カードリスト'),
-      ),
-      body: ListView.builder(
-        itemCount: cards.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(cards[index]['name']),
-            subtitle: Text(cards[index]['type']),
-          );
-        },
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            '蟲神器',
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: Colors.white,
+          bottom: TabBar(
+            labelColor: Colors.black,
+            indicatorColor: Colors.grey,
+            tabs: [
+              Tab(text: 'カードリスト'),
+              Tab(text: 'デッキ構築'),
+              Tab(text: 'デッキ閲覧'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            CardListScreen(),
+            DeckBuilderScreen(),
+            DeckViewerScreen(),
+          ],
+        ),
       ),
     );
   }
